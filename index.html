@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <title>Robot Wars</title>
+        <link href="../css/index.css" rel="stylesheet" type="text/css">
+    </head>
+
+    <body>
+        <script src="../js/three.js"></script>
+        <script src="../js/physics.js"></script>
+        <script src="../js/OrbitControls.js"></script>
+        <script src="../js/input.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
+        <script src="../js/three.min.js"></script>
+		<script src="../js/cannon.min.js"></script> <!--Physics Engine-->
+		<script src="../js/CannonDebugRenderer.js"></script><!--Useful for debugging-->
+
+        <div id="gui">
+			<button>Add Sphere</button> <!--   Adds buttons for the GUI -->
+			<button>Add Box</button>
+		</div>
+
+        <script>
+
+            var scene = new THREE.Scene();  // Where Objects & Lights go
+            var camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight, 0.1,1000);  // Real World View
+
+            //LOADS THE BACKGROUND
+            const loader = new THREE.TextureLoader();
+            const bgTexture = loader.load('../assets/background2.jpg');
+            scene.background = bgTexture;
+
+
+            var input = new Input();
+
+            // RENDERS
+            var renderer = new THREE.WebGLRenderer({antialias: true});       // Removes it from looking jagged
+            renderer.setSize(window.innerWidth, window.innerHeight);        //Settings
+            document.body.appendChild(renderer.domElement); // Creates the canvas element with the settings
+
+            window.addEventListener('resize',function()     // Listens for resize event
+            {
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+                renderer.setSize(width,height);         
+                camera.aspect = width/height;
+                camera.updateProjectionMatrix();
+            } );
+
+           // controls = new THREE.OrbitControls(camera,renderer.domElement);
+
+            //CREATE THE SHAPES
+            var geometry = new THREE.BoxGeometry(1,2,1);    // Items have forms & Materials - 3D Element
+            var playingGrid = new THREE.BoxGeometry(7,0.2,7);
+
+            //CREATE MATERIAL, COLOUR OR IMAGE TEXTURE
+
+            //CUBE
+            var material = new THREE.MeshBasicMaterial({color:0x0000FF,wireframe:false});
+            var cube = new THREE.Mesh(geometry,material);
+            scene.add(cube);
+
+            //PLAY AREA
+            var materialGrid = new THREE.MeshBasicMaterial({color:0xFFFFFF});
+            var playGrid = new THREE.Mesh(playingGrid,materialGrid);
+            scene.add(playGrid);
+
+            // CAMERA POSITION
+            camera.position.y = 2.5;
+            camera.position.z = 10;
+            
+
+
+            //GAME LOGIC
+            var update = function()
+            {
+
+            };
+            //DRAW SCENE
+            var render = function ()
+            {
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+
+                /*if(input.isLeftPressed){
+                    cube.position.x -=0.001;
+                }
+                if(input.isRightPressed){
+                    cube.position.x +=0.001;
+                }
+                if(input.isUpPressed){
+                    cube.position.y +=0.001;
+                }
+                if(input.isDownPressed){
+                    cube.position.y -=0.001;
+                }*/
+
+            };
+            //RUN GAME LOOP (UPDATE, RENDER, REPEAT)
+            var GameLoop = function()
+            {
+                requestAnimationFrame(GameLoop);
+
+                update();
+                render();
+
+            
+            };
+
+            this.tl = new TimelineMax({paused: true});  // New timeline with .3s, removes shakes
+            this.tl.to(this.cube.scale, 1, {x: 2, ease: Expo.easeOut});
+            this.tl.to(this.cube.scale, .5, {x: .5, ease: Expo.easeOut});
+            this.tl.to(this.cube.position, .5, {x: 2, ease: Expo.easeOut});
+            this.tl.to(this.cube.rotation, .5, {y: Math.PI*.5, ease: Expo.easeOut}, "=-1.5");   // Happens -1.5s before it normally would
+
+            document.body.addEventListener('click', () =>{
+                this.tl.play();
+            })
+            GameLoop();
+        </script>
+
+
+
+    </body>
+</html>
